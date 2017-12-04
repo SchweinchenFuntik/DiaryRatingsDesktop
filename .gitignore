@@ -23,7 +23,6 @@
 .gradle
 /build/
 
-#!gradle-wrapper.jar
+!gradle-wrapper.jar
 
 .gradletasknamecache
-
