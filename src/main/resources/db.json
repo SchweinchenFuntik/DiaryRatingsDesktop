@@ -1,0 +1,13 @@
+{
+ "values" : [
+   {
+     "id" : 1, "fio" : "qwe", "email" : "qwe@com", "phone" : 123
+   },
+   {
+     "id" : 2, "fio" : "asd", "email" : "asd@com", "phone" : 234
+   },
+   {
+     "id" : 3, "fio" : "zxc", "email" : "zxc@com", "phone" : 321
+   }
+ ]
+}
