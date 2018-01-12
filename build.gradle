@@ -1,8 +1,9 @@
 buildscript {
-    ext.kotlin_version = '1.2.0'
+    ext.kotlin_version = '1.2.10'
     ext.tornado_version = '1.7.12'
 
     repositories {
+        mavenLocal()
         mavenCentral()
     }
     dependencies {
@@ -10,22 +11,28 @@ buildscript {
     }
 }
 
-group 'ua.funtik.rating'
+group 'ua.funtik.ratings'
 version '0.1.0-SNAPSHOT'
 
 apply plugin: 'kotlin'
 apply plugin: 'application'
 
-mainClassName='ua.funtik.ratings.desktop.app.DiaryRatingsKt'
+mainClassName = 'ua.funtik.ratings.DiaryRatingsKt'
 
 repositories {
+    mavenLocal()
     mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
+    compile "ua.funtik.ratings:ratings-api:0.1"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compile "no.tornado:tornadofx:$tornado_version"
+    testCompile 'junit:junit:4.12'
 }
 
 compileKotlin {
@@ -35,6 +42,17 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-jar{
-    manifest.attributes["Main-Class"] = mainClassName
+jar {
+    manifest {
+        attributes(
+                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': 'com.example.demo.app.MyApp'
+        )
+    }
+    from(configurations.compile.collect { entry -> zipTree(entry) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+        exclude 'META-INF/*.RSA'
+    }
 }

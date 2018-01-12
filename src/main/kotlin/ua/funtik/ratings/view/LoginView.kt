@@ -1,6 +1,7 @@
 package ua.funtik.ratings.view
 
 import tornadofx.*
+import ua.funtik.ratings.UserType
 import ua.funtik.ratings.controller.LoginController
 
 class LoginView : View("Login") {
@@ -8,10 +9,11 @@ class LoginView : View("Login") {
 
     init {
         primaryStage.isResizable = false
-        controller.isLogin.addListener{ ob, old, newValue ->  primaryStage.isResizable = newValue }
+        controller.isLogin.addListener { _, _, newValue ->  primaryStage.isResizable = newValue }
     }
 
     override val root = form {
+
         fieldset {
             field("Email:") {
                 textfield(controller.emailProperty).required()
@@ -19,15 +21,19 @@ class LoginView : View("Login") {
             field("Password:") {
                 passwordfield(controller.passwordProperty).required()
             }
+            field("Тип учетной записи:"){
+                combobox(controller.selectUserType, UserType.values().toList())
+            }
             field(forceLabelIndent = false) {
                 label(controller.messagesProperty)
             }
-            field {
+
+            buttonbar(forceLabelIndent = true) {
                 button("Login") {
                     enableWhen(controller.model.valid)
                     isDefaultButton = true
                     action {
-                        runAsync { controller.login() }
+                        runAsyncWithProgress { controller.loginA() }
                     }
                 }
             }
@@ -39,4 +45,3 @@ class LoginView : View("Login") {
         controller.model.clearDecorators()
     }
 }
-

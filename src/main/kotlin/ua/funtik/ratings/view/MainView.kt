@@ -1,9 +1,12 @@
 package ua.funtik.ratings.view
 
 import tornadofx.*
-import ua.funtik.ratings.model.UserModel
-import ua.funtik.ratings.model.UserJson
 import ua.funtik.ratings.controller.TableController
+import ua.funtik.ratings.margin
+import ua.funtik.ratings.marginFull
+import ua.funtik.ratings.model.UserJson
+import ua.funtik.ratings.model.UserModel
+import ua.funtik.ratings.padding
 
 class MainView : View("Hello TornadoFX") {
     val controller: TableController by inject()

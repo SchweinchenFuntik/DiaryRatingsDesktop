@@ -4,6 +4,9 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.control.SelectionMode
 import tornadofx.*
 import ua.funtik.ratings.controller.StudentController
+import ua.funtik.ratings.margin
+import ua.funtik.ratings.marginFull
+import ua.funtik.ratings.model.RatingJson
 
 class StudentView : View("Student") {
     val controller: StudentController by inject()
@@ -17,27 +20,34 @@ class StudentView : View("Student") {
 
             selectionModel.selectionMode = SelectionMode.SINGLE
 
-            bindSelected(controller.model)
+            bindSelected(controller.modelSubject)
 
-            onUserSelect{
-                center = cache { label(it.simpleName) }
+            onUserSelect {
+                controller.selectSubject(it)
+                // center = cache { label(it.simpleName) }
             }
         }
 
-//        center =
+        center = tableview(controller.ratings) {
+            selectionModel.selectionMode = SelectionMode.SINGLE
 
-        bottom = hbox{
+            column("Оценка", RatingJson::valueProperty)
+            column("Дата", RatingJson::dateProperty)
+            column("Тип", RatingJson::typeProperty)
+            column("Преподаватель", RatingJson::lecturerProperty)
+
+        }
+
+        bottom = hbox {
             marginFull(10)
 
-            button("get"){
-                action{
-                    runLater { controller.get() }
-                }
+            button("Update").action {
+                runAsyncWithProgress { controller.update() }
             }
         }
     }
 
-    override val savable  = SimpleBooleanProperty(false)
+    override val savable = SimpleBooleanProperty(false)
     override val deletable = SimpleBooleanProperty(false)
 
 

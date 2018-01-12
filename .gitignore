@@ -22,7 +22,13 @@
 .idea
 .gradle
 /build/
+/out/
 
 !gradle-wrapper.jar
 
 .gradletasknamecache
+Будет удалено out/production/classes/META-INF/
+Будет удалено out/production/classes/app.properties
+Будет удалено out/production/classes/db.json
+Будет удалено src/main/kotlin/ua/funtik/ratings/components/
+Будет удалено src/test/

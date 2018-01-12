@@ -7,13 +7,9 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections.observableList
 import javafx.collections.ObservableList
 import tornadofx.*
-import javax.json.JsonObject
-import tornadofx.getValue
-import tornadofx.setValue
 import java.time.LocalDate
 import javax.json.JsonArray
-import javax.json.JsonArrayBuilder
-import javax.json.JsonValue
+import javax.json.JsonObject
 
 class GroupJson : JsonModel{
     var id: JsonObject? = null
@@ -29,7 +25,7 @@ class GroupJson : JsonModel{
     var facult by facultProperty
 
     override fun toJSON(json: JsonBuilder) {
-        with(json){
+        with(json) {
             add("id", id)
             add("name", name)
             add("departament", departament)
@@ -38,7 +34,7 @@ class GroupJson : JsonModel{
     }
 
     override fun updateModel(json: JsonObject) {
-        with(json){
+        with(json) {
             id = jsonObject("id")
             name = string("name")
             departament = string("departament")
@@ -66,7 +62,7 @@ class SubjectJson : JsonModel{
         private set
 
     override fun toJSON(json: JsonBuilder) {
-        with(json){
+        with(json) {
             add("id", id)
             add("fullName", fullName)
             add("simpleName", simpleName)
@@ -75,7 +71,7 @@ class SubjectJson : JsonModel{
     }
 
     override fun updateModel(json: JsonObject) {
-        with(json){
+        with(json) {
             id = jsonObject("id")
             fullName = string("fullName")
             simpleName = string("simpleName")
@@ -90,7 +86,8 @@ class SubjectJson : JsonModel{
     }
 }
 
-class UserJson : JsonModel{
+class UserJson : JsonModel {
+
     var id: JsonObject? = null
         private set
 
@@ -107,7 +104,7 @@ class UserJson : JsonModel{
     var access: Int? by accessProperty
 
     override fun toJSON(json: JsonBuilder) {
-        with(json){
+        with(json) {
             add("id", id)
             add("fio", fio)
             add("email", email)
@@ -126,15 +123,15 @@ class UserJson : JsonModel{
     }
 
     override fun toString(): String {
-        return "UserJson(id=$id, fioProperty=$fio, emailProperty=$email, phoneProperty=$phone, access=$access)"
+        return fio ?: "ERROR. None FIO"
     }
 }
 
-class StudentJson : JsonModel{
+class StudentJson : JsonModel {
     var id: JsonObject? = null
         private set
 
-    val userProperty = SimpleObjectProperty<GroupJson>()
+    val userProperty = SimpleObjectProperty<UserJson>()
     var user by userProperty
 
     val groupProperty = SimpleObjectProperty<GroupJson>()
@@ -146,6 +143,9 @@ class StudentJson : JsonModel{
     val yearEndTrainingProperty = SimpleObjectProperty<LocalDate>()
     var yearEndTraining by yearEndTrainingProperty
 
+    val courseProperty = SimpleIntegerProperty()
+    var course by courseProperty
+
     val butgetProperty = SimpleBooleanProperty()
     var butget by butgetProperty
 
@@ -156,6 +156,7 @@ class StudentJson : JsonModel{
             add("group", group)
             add("yearStartTraining", yearStartTraining)
             add("yearEndTraining", yearEndTraining)
+            add("course", course)
             add("butget", butget)
         }
     }
@@ -163,32 +164,33 @@ class StudentJson : JsonModel{
     override fun updateModel(json: JsonObject) {
         with(json){
             id = jsonObject("id")
-            jsonObject("user")?.let{ user = it.toModel() }
-            jsonObject("group")?.let{ group = it.toModel() }
+            jsonObject("user")?.let { user = it.toModel() }
+            jsonObject("group")?.let { group = it.toModel() }
             yearStartTraining = date("yearStartTraining")
             yearEndTraining = date("yearEndTraining")
+            int("course")?.let { course = it }
             boolean("butget")?.let{ butget = it }
         }
     }
 
     override fun toString(): String {
-        return "StudentJson(id=$id, groupProperty=$groupProperty, yearStartTrainingProperty=$yearStartTrainingProperty, yearEndTrainingProperty=$yearEndTrainingProperty, butgetProperty=$butgetProperty)"
+        return user?.toString() ?: "ERROR. None FIO"
     }
 
 }
 
-class LecturerJson : JsonModel{
+class LecturerJson : JsonModel {
     var id: JsonObject? = null
         private set
 
-    val userProperty = SimpleObjectProperty<GroupJson>()
+    val userProperty = SimpleObjectProperty<UserJson>()
     var user by userProperty
 
-    var subjects: ObservableList<SubjectJson> = observableList(emptyList())
+    var subjects: ObservableList<SubjectJson> = observableList(mutableListOf())
         private set
 
     override fun toJSON(json: JsonBuilder) {
-        with(json){
+        with(json) {
             add("id", id)
             add("user", user)
             add("subject", subjects)
@@ -196,9 +198,9 @@ class LecturerJson : JsonModel{
     }
 
     override fun updateModel(json: JsonObject) {
-        with(json){
+        with(json) {
             id = jsonObject("id")
-            jsonObject("user")?.let{ user = it.toModel() }
+            jsonObject("user")?.let { user = it.toModel() }
             jsonArray("groups")?.let {
                 subjects = it.toModel()
             }
@@ -206,9 +208,8 @@ class LecturerJson : JsonModel{
     }
 
     override fun toString(): String {
-        return "LecturerJson(id=$id, userProperty=$userProperty, subjects=$subjects)"
+        return user?.toString() ?: "ERROR. None FIO"
     }
-
 }
 
 class RatingJson : JsonModel{
@@ -234,7 +235,7 @@ class RatingJson : JsonModel{
     var type by typeProperty
 
     override fun toJSON(json: JsonBuilder) {
-        with(json){
+        with(json) {
             add("id", id)
             add("date", date)
             add("value", value)
@@ -246,7 +247,7 @@ class RatingJson : JsonModel{
     }
 
     override fun updateModel(json: JsonObject) {
-        with(json){
+        with(json) {
             id = jsonObject("id")
             value = int("value")
             date = date("date")
@@ -258,8 +259,7 @@ class RatingJson : JsonModel{
     }
 }
 
-
-class ServerResponseJson() : JsonModel {
+class ServerResponseJson : JsonModel {
 
     val codeProperty = SimpleIntegerProperty()
     var code by codeProperty
@@ -268,15 +268,37 @@ class ServerResponseJson() : JsonModel {
     var response by responseProperty
 
     override fun toJSON(json: JsonBuilder) {
-        with(json){
+        with(json) {
             add("code", code)
             add("response", response)
         }
     }
 
     override fun updateModel(json: JsonObject) {
-        with(json){
+        with(json) {
             code = int("code")!!
+            response = jsonArray("response")
+        }
+    }
+}
+
+class MessageJson : JsonModel {
+    val codeProperty = SimpleIntegerProperty(ua.funtik.ratings.api.ERROR)
+    var code by codeProperty
+
+    val responseProperty = SimpleObjectProperty<JsonArray>()
+    var response by responseProperty
+
+    override fun toJSON(json: JsonBuilder) {
+        with(json) {
+            add("code", code)
+            add("response", response)
+        }
+    }
+
+    override fun updateModel(json: JsonObject) {
+        with(json) {
+            int("code")?.let { code = it }
             response = jsonArray("response")
         }
     }
